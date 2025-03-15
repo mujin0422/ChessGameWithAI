@@ -1,1 +1,6 @@
 các thư viện cần cài đặt
+
+pygame
+
+tkinter
+

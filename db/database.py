@@ -1,4 +1,5 @@
 import sqlite3
+import os
 
 class Database:
     def __init__(self, db_name="users.db"):
@@ -23,6 +24,8 @@ class Database:
             return True
         except sqlite3.IntegrityError:
             return False  # Username already exists
+        print(f"Database file path: {os.path.abspath('users.db')}")
+
 
     def login_user(self, username, password):
         self.cursor.execute("SELECT * FROM users WHERE username = ? AND password = ?", (username, password))
