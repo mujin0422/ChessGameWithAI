@@ -1,25 +1,32 @@
-# Kết nối MySQL
+import sqlite3
 
-import mysql.connector
-from config import MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE
+class Database:
+    def __init__(self, db_name="users.db"):
+        self.conn = sqlite3.connect(db_name)
+        self.cursor = self.conn.cursor()
+        self.create_table()
 
-def get_connection():
-    return mysql.connector.connect(
-        host=MYSQL_HOST,
-        user=MYSQL_USER,
-        password=MYSQL_PASSWORD,
-        database=MYSQL_DATABASE
-    )
+    def create_table(self):
+        self.cursor.execute('''
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT UNIQUE NOT NULL,
+                password TEXT NOT NULL
+            )
+        ''')
+        self.conn.commit()
 
-def create_table():
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            username VARCHAR(50) UNIQUE NOT NULL,
-            password VARCHAR(255) NOT NULL
-        )
-    """)
-    conn.commit()
-    conn.close()
+    def register_user(self, username, password):
+        try:
+            self.cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, password))
+            self.conn.commit()
+            return True
+        except sqlite3.IntegrityError:
+            return False  # Username already exists
+
+    def login_user(self, username, password):
+        self.cursor.execute("SELECT * FROM users WHERE username = ? AND password = ?", (username, password))
+        return self.cursor.fetchone() is not None
+
+    def close(self):
+        self.conn.close()
