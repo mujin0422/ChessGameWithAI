@@ -78,18 +78,14 @@ class Game:
             piece.set_texture(size = 80)
             # Tải ảnh quân cờ từ đường dẫn
             img = pygame.image.load(piece.texture)
-            #img = pygame.transform.scale(img, (SQSIZE, SQSIZE))
 
+            img = pygame.transform.scale(img, (80, 160))
             # Lấy kích thước thật của quân cờ 
             img_width, img_height = img.get_size()
-
             # Tính toán vị trí để căn giữa quân cờ vào ô cờ
-            # cách cũ (1): img_center = col * SQSIZE + SQSIZE // 2 + BOARD_X, row * SQSIZE + SQSIZE // 2 + BOARD_Y
-            img_x = col * SQSIZE + BOARD_X + (SQSIZE - img_width) // 2
-            img_y = row * SQSIZE + BOARD_Y + (SQSIZE - img_height - 128) // 2
-
+            img_x = col * SQSIZE + BOARD_X + (SQSIZE - img_width ) // 2
+            img_y = row * SQSIZE + BOARD_Y + (SQSIZE - img_height - 128 + 48) // 2
             # Cập nhật vị trí quân cờ 
-            # cách cũ (1): piece.texture_rect = img.get_rect(center = img_center)
             piece.texture_rect = pygame.Rect(img_x, img_y, img_width, img_height)
 
             # Vẽ quân cờ lên màn hình

@@ -1,7 +1,7 @@
 """ LƯU HẰNG SỐ CỦA GAME
 - Lưu các giá trị cố đinh như kích thước bàn cờ, tọa độ """
-WIDTH = 600
-HEIGHT = 600
+WIDTH = 450
+HEIGHT = 450
 
 # SCREEN DIMENSION
 SCREEN_WIDTH = WIDTH + 500

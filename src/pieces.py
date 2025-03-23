@@ -1,22 +1,21 @@
-""" ĐỊNH NGĨA CÁC QUÂN CỜ 
-- Chứa các class đại diện cho từng quân cờ 
-- Định nghĩa hình ảnh, màu sắc, cách di chuyển của các quân cờ
-"""
+""" ========================== LỚP QUẢN LÝ QUÂN CỜ - Piece ===========================
+|   1 Khởi tạo các quân cờ                                                      |
+|     - Tạo bàn cờ (_create())                                                       |
+|     - Thêm các quân cờ vào bàn tại vị trí ban đầu (_add_pieces())                  |
+                             |
+|   - Xử lý các nước đi hợp lệ của từng quân cờ.                                     |
+|   - Kiểm tra các điều kiện đặc biệt như phong cấp, nhập thành, bắt tốt qua đường.  |
+|   - Lưu trạng thái của bàn cờ và nước đi cuối cùng.                                |
+==================================================================================="""
 import os
 
+
+""" LỚP (Piece): lớp cha của các quân cờ  """
 class Piece:
-  """ Lớp cha của các quân cờ """
+  
   def __init__(self, name, color, value, texture = None, texture_rect = None):
-    """ Khởi tạo một quân cờ.
-    :param name: Tên quân cờ (pawn, knight, bishop, rook, queen, king).
-    :param color: Màu quân cờ ("white" hoặc "black").
-    :param value: Giá trị điểm số của quân cờ.
-    :param texture: Đường dẫn hình ảnh quân cờ.
-    :param texture_rect: Vị trí và kích thước hình ảnh trên màn hình.
-    """
     self.name = name
     self.color = color
-
     # khi huan luyen AI quan den se co gia tri am, quan trang co gia tri duong 
     value_sign = 1 if color == "white" else -1
     self.value = value * value_sign
@@ -28,18 +27,21 @@ class Piece:
     self.texture_rect  = texture_rect # Lưu vị trí hình ảnh trên màn hình
 
 
+  """============== THIẾT LẬP HÌNH ẢNH QUÂN CỜ THEO MÀU VÀ TÊN =============="""
   def set_texture(self, size = 80):
-    """ Thiết lập đường dẫn ảnh của quân cờ dựa trên tên, màu sắc """
     self.texture = os.path.join(
       f'assets/images/imgs-{size}px/{self.color}_{self.name}.png'
     )
 
+  """======= THÊM MỘT BƯỚC ĐI HỢP LỆ VÀO DANH SÁCH CÁC BƯỚC ĐI HỌP LỆ ======="""
   def add_move(self, move):
-    """ Thêm một nước đi hợp lệ vào danh sách moves """
     self.moves.append(move)
 
+  """============ LÀM MỚI DANH SÁCH CÁC BƯỚC ĐI HỢP LỆ VỀ RỖNG =============="""
   def clear_move(self):
     self.moves = []
+
+
 
 class Pawn(Piece):
   """ Khởi tạo quân tốt với màu sắc và giá trị 1.0.

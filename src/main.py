@@ -18,8 +18,6 @@ class Main:
     self.game = Game()
   
   def mainLoop(self):
-
-    #ĐẶT BIẾN ĐỂ DỄ GỌI
     game = self.game
     screen = self.screen
     board = self.game.board
