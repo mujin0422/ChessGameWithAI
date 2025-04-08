@@ -20,111 +20,74 @@ class Main:
   def mainLoop(self):
     game = self.game
     screen = self.screen
-    board = self.game.board
-    dragger = self.game.dragger
+    board = game.board
+    selector = game.selector
 
     while True:
-      screen.fill((0, 0, 0))
+        screen.fill((0, 0, 0))
 
-      game.show_bg(screen)
-      game.show_last_move(screen)
-      game.show_moves(screen)
-      game.show_hover(screen)
-      game.show_pieces(screen)
+        # Vẽ các thành phần
+        game.show_bg(screen)
+        game.show_last_move(screen)
+        game.show_moves(screen)
+        game.show_hover(screen)
+        game.show_pieces(screen)
 
+        # Vòng xử lý sự kiện
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouseX, mouseY = event.pos
+                clicked_col = (mouseX - BOARD_X) // SQSIZE
+                clicked_row = (mouseY - BOARD_Y) // SQSIZE
 
-      if dragger.dragging:
-        dragger.update_blit(screen)
+                if 0 <= clicked_row < ROWS and 0 <= clicked_col < COLS:
+                    clicked_square = board.squares[clicked_row][clicked_col]
 
+                    # Đã chọn quân cờ từ trước
+                    if selector.selecting:
+                        selected_piece = selector.piece
+                        start_row, start_col = selector.rowcol
+                        move = Move(Square(start_row, start_col), Square(clicked_row, clicked_col))
 
-      for event in pygame.event.get():
+                        if board.valid_move(selected_piece, move):
+                            captured = clicked_square.has_piece()
+                            board.move(selected_piece, move)
+                            board.set_true_en_passant(selected_piece)
 
-        #click
-        if event.type == pygame.MOUSEBUTTONDOWN:
-          dragger.update_mouse(event.pos)
-          
-          clicked_col = (dragger.mouseX - BOARD_X) // SQSIZE
-          clicked_row = (dragger.mouseY - BOARD_Y) // SQSIZE
+                            game.play_sound(captured)
+                            game.next_turn()
 
-          # Kiểm tra xem tọa độ có nằm trong phạm vi bàn cờ không
-          if 0 <= clicked_row < ROWS and 0 <= clicked_col < COLS:
+                        # Hủy chọn dù có đi hay không
+                        selector.unselect_piece()
 
-            #if cliced sqaure has a piece
-            if board.squares[clicked_row][clicked_col].has_piece():
-              piece = board.squares[clicked_row][clicked_col].piece
-              # valid piece color
-              if piece.color == game.next_player:
-                board.calc_moves(piece, clicked_row, clicked_col, bool = True)
-                dragger.save_initial(event.pos)
-                dragger.drag_piece(piece)
-                  
-                game.show_bg(screen)
-                game.show_last_move(screen)
-                game.show_moves(screen)
-                game.show_pieces(screen)
+                    else:
+                        # Nếu click vào quân cờ đúng lượt
+                        if clicked_square.has_piece():
+                            piece = clicked_square.piece
+                            if piece.color == game.next_player:
+                                board.calc_moves(piece, clicked_row, clicked_col, True)
+                                selector.select_piece(piece, (clicked_row, clicked_col))
 
-        #mouse motion
-        elif event.type == pygame.MOUSEMOTION:
-          motion_row =(event.pos[1] - BOARD_Y) // SQSIZE
-          motion_col =(event.pos[0] - BOARD_X) // SQSIZE
-          game.set_hover(motion_row, motion_col)
+            elif event.type == pygame.MOUSEMOTION:
+                hover_row = (event.pos[1] - BOARD_Y) // SQSIZE
+                hover_col = (event.pos[0] - BOARD_X) // SQSIZE
+                game.set_hover(hover_row, hover_col)
 
-          if dragger.dragging:
-            dragger.update_mouse(event.pos)
-            game.show_bg(screen)
-            game.show_last_move(screen)
-            game.show_moves(screen)
-            game.show_hover(screen)
-            game.show_pieces(screen)
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_t:
+                    game.change_theme()
 
-            dragger.update_blit(screen)
+                elif event.key == pygame.K_r:
+                    game.reset()
+                    game = self.game
+                    board = game.board
+                    selector = game.selector
 
-        #click release
-        elif event.type == pygame.MOUSEBUTTONUP:
-          if dragger.dragging:
-            dragger.update_mouse(event.pos)
-            released_row = (dragger.mouseY - BOARD_Y) // SQSIZE
-            released_col = (dragger.mouseX - BOARD_X) // SQSIZE
+            elif event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
 
-            initial = Square(dragger.initial_row, dragger.initial_col)
-            final = Square(released_row, released_col)
-            move = Move(initial, final)
-
-            # valid move right
-            if board.valid_move(dragger.piece, move):
-              captured = board.squares[released_row][released_col].has_piece()
-
-              board.move(dragger.piece, move)
-              board.set_true_en_passant(dragger.piece)
-
-              game.play_sound(captured)
-              game.show_bg(screen)
-              game.show_last_move(screen)
-              game.show_pieces(screen)
-
-              game.next_turn()
-
-          dragger.undrag_piece()
-
-        # key press
-        elif event.type == pygame.KEYDOWN:
-          # change themes
-          if event.key == pygame.K_t:
-            game.change_theme()
-
-          if event.key == pygame.K_r:
-            game.reset()
-            game = self.game
-            board = self.game.board
-            dragger = self.game.dragger
-
-        # quit game
-        elif event.type == pygame.QUIT:
-          pygame.quit()
-          sys.exit()
-
-
-      pygame.display.update()
+        pygame.display.update()
 
 
 

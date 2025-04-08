@@ -4,9 +4,9 @@
 import pygame
 from const import *
 from board import Board
-from dragger import Dragger
 from config import Config
 from square import Square
+from selector import Selector
 
 class Game:
   def __init__(self):
@@ -14,8 +14,8 @@ class Game:
     self.next_player = "white"
     self.hovered_sqr = None
     self.board = Board()
-    self.dragger = Dragger()
     self.config = Config()
+    self.selector = Selector()
 
   
   def show_bg(self, surface):
@@ -64,71 +64,77 @@ class Game:
 
 
   
-
+  """ Hiển thị tất cả quân cờ lên bàn cờ (trừ quân đang được chọn)."""
   def show_pieces(self, surface):
-    """ Hiển thị tất cả quân cờ lên bàn cờ."""
     for row in range(ROWS):
-      for col in range(COLS):
-        # Kiểm tra xem ô hiện tại có quân cờ không
-        if self.board.squares[row][col].has_piece():
-          piece = self.board.squares[row][col].piece
+        for col in range(COLS):
+            square = self.board.squares[row][col]
+            if square.has_piece():
+                piece = square.piece
 
-          if piece is not self.dragger.piece: 
-            
-            piece.set_texture(size = 80)
-            # Tải ảnh quân cờ từ đường dẫn
-            img = pygame.image.load(piece.texture)
+                if self.selector.selecting and piece == self.selector.piece:
+                    continue
 
-            img = pygame.transform.scale(img, (80, 160))
-            # Lấy kích thước thật của quân cờ 
-            img_width, img_height = img.get_size()
-            # Tính toán vị trí để căn giữa quân cờ vào ô cờ
-            img_x = col * SQSIZE + BOARD_X + (SQSIZE - img_width ) // 2
-            img_y = row * SQSIZE + BOARD_Y + (SQSIZE - img_height - 128 + 48) // 2
-            # Cập nhật vị trí quân cờ 
-            piece.texture_rect = pygame.Rect(img_x, img_y, img_width, img_height)
+                piece.set_texture(size=80)
+                img = pygame.image.load(piece.texture)
+                img = pygame.transform.scale(img, (80, 160))
 
-            # Vẽ quân cờ lên màn hình
-            surface.blit(img, piece.texture_rect)
+                img_width, img_height = img.get_size()
+                img_x = col * SQSIZE + BOARD_X + (SQSIZE - img_width) // 2
+                img_y = row * SQSIZE + BOARD_Y + (SQSIZE - img_height - 128 + 48) // 2
+                piece.texture_rect = pygame.Rect(img_x, img_y, img_width, img_height)
 
+                surface.blit(img, piece.texture_rect)
+    # THÊM CÁI NÀY VÀO NÈ TIẾN ++++++++++++++++++++++++++++++++
+    if self.selector.selecting and self.selector.piece:
+      piece = self.selector.piece
+      
+      for row in range(ROWS):
+          for col in range(COLS):
+              if self.board.squares[row][col].piece == piece:
+                  piece.set_texture(size=80)
+                  img = pygame.image.load(piece.texture)
+                  img = pygame.transform.scale(img, (80, 160))
 
+                  img_width, img_height = img.get_size()
+                  img_x = col * SQSIZE + BOARD_X + (SQSIZE - img_width) // 2
+                  img_y = row * SQSIZE + BOARD_Y + (SQSIZE - img_height - 128 + 48) // 2
+                  piece.texture_rect = pygame.Rect(img_x, img_y, img_width, img_height)
+
+                  surface.blit(img, piece.texture_rect)
+                  break 
+
+  """ Hiển thị nước đi hợp lệ của quân cờ đang được chọn. """
   def show_moves(self, surface):
-    """ Hiển thị nước đi hợp lệ của quân cờ. """
     theme = self.config.theme
-    if self.dragger.dragging:
-      piece = self.dragger.piece
+    if self.selector.selecting:
+        piece = self.selector.piece
 
-      for move in piece.moves:
-        # color
-        color = theme.moves.light if (move.final.row + move.final.col) % 2 == 0 else theme.moves.dark
-        #rect
-        rect = (move.final.col * SQSIZE + BOARD_X, move.final.row * SQSIZE + BOARD_Y, SQSIZE, SQSIZE)
-        #blit
-        pygame.draw.rect(surface, color, rect)
+        for move in piece.moves:
+            # Chọn màu nền cho nước đi (tuỳ theo màu ô bàn cờ)
+            color = theme.moves.light if (move.final.row + move.final.col) % 2 == 0 else theme.moves.dark
+            rect = ( move.final.col * SQSIZE + BOARD_X, move.final.row * SQSIZE + BOARD_Y, SQSIZE, SQSIZE)
+            pygame.draw.rect(surface, color, rect)
 
+
+  """ Hiển thị nước đi cuối cùng (tức là quân cờ vừa đi: vị trí bắt đầu và vị trí hiện tạitại) """
   def show_last_move(self, surface):
-    """ Hiển thị nước đi cuối cùng. """
     theme = self.config.theme
     if self.board.last_move:
       initial = self.board.last_move.initial
       final = self.board.last_move.final
 
       for pos in [initial, final]:
-        # color
         color = theme.trace.light if (pos.row + pos.col) % 2 == 0 else theme.trace.dark
-        #rect
         rect = (pos.col * SQSIZE + BOARD_X, pos.row * SQSIZE + BOARD_Y, SQSIZE, SQSIZE)
-        #blit
         pygame.draw.rect(surface, color, rect)
 
+
+  """ Hiển thị viền ô cờ khi di chuột qua. """
   def show_hover(self, surface):
-    """ Hiển thị viền ô cờ khi di chuột qua. """
     if self.hovered_sqr:
-      # color
       color = (180, 180, 180) 
-      #rect
       rect = (self.hovered_sqr.col * SQSIZE + BOARD_X, self.hovered_sqr.row * SQSIZE + BOARD_Y, SQSIZE, SQSIZE)
-      #blit
       pygame.draw.rect(surface, color, rect, width = 3)
 
   def next_turn(self):

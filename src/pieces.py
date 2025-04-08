@@ -19,10 +19,8 @@ class Piece:
     # khi huan luyen AI quan den se co gia tri am, quan trang co gia tri duong 
     value_sign = 1 if color == "white" else -1
     self.value = value * value_sign
-
     self.moves = [] # Danh sách các nước đi hợp lệ 
     self.moved = False # Kiểm tra quân cờ đã di chuyển chưa 
-
     self.set_texture() # Gán đường dẫn hình ảnh cho các quâ cờ 
     self.texture_rect  = texture_rect # Lưu vị trí hình ảnh trên màn hình
 
@@ -40,8 +38,6 @@ class Piece:
   """============ LÀM MỚI DANH SÁCH CÁC BƯỚC ĐI HỢP LỆ VỀ RỖNG =============="""
   def clear_move(self):
     self.moves = []
-
-
 
 class Pawn(Piece):
   """ Khởi tạo quân tốt với màu sắc và giá trị 1.0.
