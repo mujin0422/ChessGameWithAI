@@ -53,13 +53,12 @@ class Main:
                             captured = clicked_square.has_piece()
                             board.move(selected_piece, move)
                             board.set_true_en_passant(selected_piece)
-
                             game.play_sound(captured)
+
                             game.next_turn()
 
                         # Hủy chọn dù có đi hay không
                         selector.unselect_piece()
-
                     else:
                         # Nếu click vào quân cờ đúng lượt
                         if clicked_square.has_piece():

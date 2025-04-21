@@ -17,6 +17,8 @@ class Square:
 
   """So sánh hai ô cờ dựa trên vị trí hàng và cột."""
   def __eq__(self, other):
+    if not hasattr(other, 'row') or not hasattr(other, 'col'):
+        return False
     return self.row == other.row and self.col == other.col
 
   """Kiểm tra xem ô cờ có chứa quân cờ hay không."""

@@ -102,7 +102,6 @@ class Board:
 
 
 
-
   """===================== KIỂM TRA NƯỚC ĐI HỢP LỆ ======================="""
   def valid_move(self, piece, move):
     return move in piece.moves
@@ -427,3 +426,28 @@ class Board:
 
 
 
+def GetAllowedMoves(self, piece, row, col):
+    """
+    Trả về danh sách các nước đi hợp lệ của một quân cờ tại vị trí (row, col),
+    đã lọc các nước khiến vua bị chiếu.
+    """
+    moves = []
+    self.calc_moves(piece, row, col)  # Tính toán nước đi thô
+
+    for move in piece.moves:
+        # Lưu lại trạng thái trước khi thử di chuyển
+        captured_piece = self.squares[move.final.row][move.final.col].piece
+        self.squares[move.initial.row][move.initial.col].piece = None
+        self.squares[move.final.row][move.final.col].piece = piece
+
+        # Kiểm tra nếu sau nước đi, vua không bị chiếu
+        if not self.in_check(piece.color):
+            moves.append(move)
+
+        # Phục hồi trạng thái bàn cờ
+        self.squares[move.initial.row][move.initial.col].piece = piece
+        self.squares[move.final.row][move.final.col].piece = captured_piece
+
+    # Gán lại các nước đi hợp lệ cho quân cờ
+    piece.moves = moves
+    return moves
