@@ -16,6 +16,9 @@ class Game:
     self.board = Board()
     self.config = Config()
     self.selector = Selector()
+    self.game_over = False  # Thêm trạng thái kết thúc game
+    self.winner = None      # Lưu màu người thắng ('white'/'black')
+    self.result = None      # Lưu kết quả ('checkmate'/'stalemate')
 
   
   def show_bg(self, surface):
@@ -38,28 +41,12 @@ class Game:
           lbl_y = BOARD_Y + row * SQSIZE + (SQSIZE - lbl.get_height()) // 2
           surface.blit(lbl, (lbl_x, lbl_y))
 
-        # Hiển thị số hàng (1-8) bên phải bàn cờ
-        if col == 7:
-          color = theme.bg.dark if (row + col) % 2 == 0 else theme.bg.light
-          lbl = self.config.font.render(str(ROWS - row), 1, color)
-          lbl_x = BOARD_X + COLS * SQSIZE + 5  # Đẩy số ra ngoài bên phải
-          lbl_y = BOARD_Y + row * SQSIZE + (SQSIZE - lbl.get_height()) // 2
-          surface.blit(lbl, (lbl_x, lbl_y))
-
         # Hiển thị chữ cái cột (A-H) ở hàng dưới cùng
         if row == 7:
           color = theme.bg.dark if (row + col) % 2 == 0 else theme.bg.light
           lbl = self.config.font.render(Square.get_alphacol(col), 1, color)
           lbl_x = BOARD_X + col * SQSIZE + (SQSIZE - lbl.get_width()) // 2
           lbl_y = BOARD_Y + ROWS * SQSIZE + 5  # Đẩy chữ xuống dưới bàn cờ
-          surface.blit(lbl, (lbl_x, lbl_y))
-
-        # Hiển thị chữ cái cột (A-H) ở hàng trên cùng
-        if row == 0:
-          color = theme.bg.dark if (row + col) % 2 == 0 else theme.bg.light
-          lbl = self.config.font.render(Square.get_alphacol(col), 1, color)
-          lbl_x = BOARD_X + col * SQSIZE + (SQSIZE - lbl.get_width()) // 2
-          lbl_y = BOARD_Y - 20  # Đẩy chữ lên trên bàn cờ
           surface.blit(lbl, (lbl_x, lbl_y))
 
 

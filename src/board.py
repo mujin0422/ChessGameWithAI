@@ -101,6 +101,73 @@ class Board:
     self.last_move = move
 
 
+  """===============================================KIỂM TRA TRẠNG THÁI=============================================="""
+  def check_game_status(self, color):
+    # Tìm Vua
+    print(f"\n=== Kiểm tra trạng thái cho {color} ===")
+    king_pos = None
+    for row in range(ROWS):
+        for col in range(COLS):
+            piece = self.squares[row][col].piece
+            if isinstance(piece, King) and piece.color == color:
+                king_pos = (row, col)
+                print(f"[DEBUG] Tìm thấy Vua tại ({row}, {col})")
+                break
+        if king_pos:
+            break
+    
+    if not king_pos:
+        print("[DEBUG] Không tìm thấy Vua!")
+        return None
+
+    # Kiểm tra chiếu
+    in_check = False
+    for row in range(ROWS):
+        for col in range(COLS):
+            piece = self.squares[row][col].piece
+            if piece and piece.color != color:
+                self.calc_moves(piece, row, col, bool=False)
+                for move in piece.moves:
+                    if (move.final.row, move.final.col) == king_pos:
+                        print(f"[DEBUG] {piece.__class__.__name__} tại ({row}, {col}) đang chiếu Vua!")
+                        in_check = True
+                piece.clear_move()
+                if in_check:
+                    break
+        if in_check:
+            break
+
+    # Kiểm tra nước đi hợp lệ
+    has_legal_move = False
+    for row in range(ROWS):
+        for col in range(COLS):
+            piece = self.squares[row][col].piece
+            if piece and piece.color == color:
+                self.calc_moves(piece, row, col, bool=True)
+                if piece.moves:
+                    print(f"[DEBUG] {piece.__class__.__name__} tại ({row}, {col}) có nước đi hợp lệ")
+                    has_legal_move = True
+                piece.clear_move()
+                if has_legal_move:
+                    break
+        if has_legal_move:
+            break
+
+    # Xác định trạng thái
+    if in_check:
+        if not has_legal_move:
+            print("[DEBUG] Kết quả: CHIẾU BÍ!")
+            return 'checkmate'
+        print("[DEBUG] Kết quả: Đang bị chiếu nhưng còn nước đi")
+        return 'check'
+    elif not has_legal_move:
+        print("[DEBUG] Kết quả: HẾT NƯỚC ĐI (hòa)")
+        return 'stalemate'
+    print("[DEBUG] Kết quả: Trạng thái bình thường")
+    return None
+  
+  """=============================================END KIỂM TRA TRẠNG THÁI============================================"""
+
 
   """===================== KIỂM TRA NƯỚC ĐI HỢP LỆ ======================="""
   def valid_move(self, piece, move):
@@ -244,7 +311,6 @@ class Board:
               else:
                 #append new move
                 piece.add_move(move)
-
 
     def knight_moves():
       # 8 possive moves

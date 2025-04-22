@@ -52,11 +52,25 @@ class Main:
                         if board.valid_move(selected_piece, move):
                             captured = clicked_square.has_piece()
                             board.move(selected_piece, move)
+
+                            """=============KIỂM TRA THĂNG THUA============="""
+                            for color in ['white', 'black']:
+                                status = board.check_game_status(color)
+                                if status == 'checkmate':
+                                    game.game_over = True
+                                    game.winner = 'black' if color == 'white' else 'white'
+                                    game.result = 'checkmate'
+                                    break
+                                elif status == 'stalemate':
+                                    game.game_over = True
+                                    game.result = 'stalemate'
+                                    break
+                            """==========end KIỂM TRA THĂNG THUA============"""
+
                             board.set_true_en_passant(selected_piece)
                             game.play_sound(captured)
 
                             game.next_turn()
-
                         # Hủy chọn dù có đi hay không
                         selector.unselect_piece()
                     else:
@@ -78,13 +92,42 @@ class Main:
 
                 elif event.key == pygame.K_r:
                     game.reset()
-                    game = self.game
+                    # Reset trạng thái kết thúc của lớp GAME
+                    game.game_over = False  
+                    game.winner = None
+                    game.result = None
+                    # Cập nhật lại các biến tham chiếu
                     board = game.board
                     selector = game.selector
-
             elif event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+
+        # =========== HIỂN THỊ THÔNG BÁO KHI GAME KẾT THÚC ============
+        if game.game_over:
+            # Tạo overlay mờ
+            overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
+            overlay.fill((0, 0, 0, 180))  # Màu đen với độ trong suốt
+            screen.blit(overlay, (0, 0))
+            # Hiển thị thông báo
+            font = pygame.font.SysFont('Arial', 50, bold=True)
+            if game.result == 'checkmate':
+                winner = 'WHITE' if game.winner == 'white' else 'ĐEN'
+                text = f"{winner} WIN!"
+                color = (255, 215, 0)  
+            else:
+                text = "DRAW!"
+                color = (255, 255, 255) 
+            text_surface = font.render(text, True, color)
+            text_rect = text_surface.get_rect(center=(SCREEN_WIDTH//2, SCREEN_HEIGHT//2))
+            screen.blit(text_surface, text_rect)
+            
+            # Hướng dẫn chơi lại
+            font_small = pygame.font.SysFont('Arial', 30)
+            restart_text = font_small.render("Press R To Rematch", True, (200, 200, 200))
+            restart_rect = restart_text.get_rect(center=(SCREEN_WIDTH//2, SCREEN_HEIGHT//2 + 60))
+            screen.blit(restart_text, restart_rect)
+        # ========= END HIỂN THỊ THÔNG BÁO KHI GAME KẾT THÚC ==========
 
         pygame.display.update()
 
@@ -92,8 +135,3 @@ class Main:
 
 main = Main()
 main.mainLoop()
-
-
-
-
-
