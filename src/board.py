@@ -71,6 +71,8 @@ class Board:
     final = move.final
 
     en_passant_empty = self.squares[final.row][final.col].isempty() # ô điểm đến trống 
+    if isinstance(piece, Pawn):
+        piece.has_moved = True
     # console board move update
     self.squares[initial.row][initial.col].piece = None
     self.squares[final.row][final.col].piece = piece
@@ -104,14 +106,14 @@ class Board:
   """===============================================KIỂM TRA TRẠNG THÁI================================================"""
   def check_game_status(self, color):
     # Tìm Vua
-    print(f"\n=== Kiểm tra trạng thái cho {color} ===")
+    print(f"\n=== Kiem tra trang thai cho {color} ===")
     king_pos = None
     for row in range(ROWS):
         for col in range(COLS):
             piece = self.squares[row][col].piece
             if isinstance(piece, King) and piece.color == color:
                 king_pos = (row, col)
-                print(f"[DEBUG] Tìm thấy Vua tại ({row}, {col})")
+                print(f"[DEBUG] Tim thay Vua tai ({row}, {col})")
                 break
         if king_pos:
             break
@@ -145,7 +147,7 @@ class Board:
             if piece and piece.color == color:
                 self.calc_moves(piece, row, col, bool=True)
                 if piece.moves:
-                    print(f"[DEBUG] {piece.__class__.__name__} tại ({row}, {col}) có nước đi hợp lệ")
+                    print(f"[DEBUG] {piece.__class__.__name__} tai ({row}, {col}) co nuoc di hop le")
                     has_legal_move = True
                 piece.clear_move()
                 if has_legal_move:
@@ -163,7 +165,7 @@ class Board:
     elif not has_legal_move:
         print("[DEBUG] Kết quả: HẾT NƯỚC ĐI (hòa)")
         return 'stalemate'
-    print("[DEBUG] Kết quả: Trạng thái bình thường")
+    print("[DEBUG] Ket qua: Trang thai binh thuong")
     return None
   
   """=============================================END KIỂM TRA TRẠNG THÁI============================================"""
@@ -229,26 +231,31 @@ class Board:
   def calc_moves(self, piece, row, col, bool = True):
     def pawn_moves():
       steps = 1 if piece.moved else 2
-      # vertical moves
-      start = row + piece.dir
-      end = row + (piece.dir * (1 + steps))
-      for possible_move_row in range(start, end, piece.dir):
-        if Square.in_range(possible_move_row):
-          if self.squares[possible_move_row][col].isempty():
-            # create initial and final move squares
-            initial = Square(row, col)
-            final= Square(possible_move_row, col)
-            # create a new move
-            move = Move(initial,final)
-            # check potencial checks
-            if bool:
-              if not self.in_check(piece, move):
+      possible_move_row = row + piece.dir
+      if Square.in_range(possible_move_row) and self.squares[possible_move_row][col].isempty():
+        initial = Square(row, col)
+        final = Square(possible_move_row, col)
+        move = Move(initial, final)
+        if bool:
+            if not self.in_check(piece, move):
                 piece.add_move(move)
-            else:
-              piece.add_move(move)
-          else: break
-        else: break
-      
+        else:
+            piece.add_move(move)
+
+    # Bước đi đầu tiên (2 ô) - kiểm tra bằng vị trí ban đầu
+      if (piece.color == "white" and row == 6) or (piece.color == "black" and row == 1):
+        possible_move_row = row + (piece.dir * 2)
+        intermediate_row = row + piece.dir
+        if (Square.in_range(possible_move_row) and 
+            self.squares[possible_move_row][col].isempty() and
+            self.squares[intermediate_row][col].isempty()):
+            initial = Square(row, col)
+            final = Square(possible_move_row, col)
+            move = Move(initial, final)
+            if bool:
+                if not self.in_check(piece, move):
+                    piece.add_move(move)
+            else: piece.add_move(move)
       # diagonal moves
       possible_move_row = row + piece.dir
       possible_move_cols = [col-1, col+1]

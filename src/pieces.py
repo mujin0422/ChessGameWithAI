@@ -40,17 +40,17 @@ class Piece:
     self.moves = []
 
 class Pawn(Piece):
-  """ Khởi tạo quân tốt với màu sắc và giá trị 1.0.
-  - Trắng đi lên (hướng -1)
-  - Đen đi xuống (hướng +1)
-  """
-  def __init__(self, color):
-    if color == "white":
-      self.dir = -1
-    else: 
-      self.dir = 1
-    self.en_passant = False
-    super().__init__("pawn", color, 1.0)
+    """ Khởi tạo quân tốt với màu sắc và giá trị 1.0.
+    - Trắng đi lên (hướng -1)
+    - Đen đi xuống (hướng +1)
+    """
+    def __init__(self, color):
+      if color == "white":
+          self.dir = -1
+      else: 
+          self.dir = 1
+      self.en_passant = False
+      super().__init__("pawn", color, 1.0)
 
 
 class Knight(Piece):

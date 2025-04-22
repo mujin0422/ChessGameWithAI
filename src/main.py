@@ -9,6 +9,7 @@ from const import *
 from game import Game
 from square import Square
 from move import Move
+from ai import AI_Minimax, AI_Stupid
 
 class Main:
   def __init__(self):
@@ -16,6 +17,9 @@ class Main:
     self.screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
     pygame.display.set_caption('CHESS GAME')
     self.game = Game()
+    self.ai_type = 'minimax'
+    self.ai_enabled = True
+
   
   def mainLoop(self):
     game = self.game
@@ -32,6 +36,32 @@ class Main:
         game.show_moves(screen)
         game.show_hover(screen)
         game.show_pieces(screen)
+        
+        # AI tự đi nếu đến lượt đen
+        if self.ai_enabled and game.next_player == 'black' and not game.game_over:
+            pygame.time.delay(400)  # Cho dễ theo dõi
+            ai = AI_Minimax(board) if self.ai_type == 'minimax' else AI_Stupid(board)
+            result = ai.get_best_move('black') if self.ai_type == 'minimax' else ai.get_random_move('black')
+
+            if result:
+                piece, move = result
+                captured = board.squares[move.final.row][move.final.col].has_piece()
+                board.move(piece, move)
+                board.set_true_en_passant(piece)
+                game.play_sound(captured)
+                game.next_turn()
+
+                for color in ['white', 'black']:
+                    status = board.check_game_status(color)
+                    if status == 'checkmate':
+                        game.game_over = True
+                        game.winner = 'black' if color == 'white' else 'white'
+                        game.result = 'checkmate'
+                        break
+                    elif status == 'stalemate':
+                        game.game_over = True
+                        game.result = 'stalemate'
+                        break
 
         # Vòng xử lý sự kiện
         for event in pygame.event.get():
@@ -56,8 +86,9 @@ class Main:
                             """=============KIỂM TRA THĂNG THUA============="""
                             for color in ['white', 'black']:
                                 status = board.check_game_status(color)
+                                print(f"Trạng thái của {color}: {status}") 
                                 if status == 'checkmate':
-                                    game.game_over = True
+                                    game.game_over = True   
                                     game.winner = 'black' if color == 'white' else 'white'
                                     game.result = 'checkmate'
                                     break
@@ -99,6 +130,12 @@ class Main:
                     # Cập nhật lại các biến tham chiếu
                     board = game.board
                     selector = game.selector
+                elif event.key == pygame.K_a:
+                    self.ai_enabled = not self.ai_enabled  # Bật/Tắt AI
+                elif event.key == pygame.K_m:
+                    self.ai_type = 'minimax'  # Đổi sang Minimax AI
+                elif event.key == pygame.K_n:
+                    self.ai_type = 'random'   # Đổi sang AI Random
             elif event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
