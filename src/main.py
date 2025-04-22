@@ -103,7 +103,7 @@ class Main:
                 pygame.quit()
                 sys.exit()
 
-        # =========== HIỂN THỊ THÔNG BÁO KHI GAME KẾT THÚC ============
+        # =========== HIỂN THỊ THÔNG BÁO KHI GAME KẾT THÚC ==============
         if game.game_over:
             # Tạo overlay mờ
             overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)

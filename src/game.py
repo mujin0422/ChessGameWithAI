@@ -16,7 +16,7 @@ class Game:
     self.board = Board()
     self.config = Config()
     self.selector = Selector()
-    self.game_over = False  # Thêm trạng thái kết thúc game
+    self.game_over = False  # Thêm trạng thái kết thúc game //
     self.winner = None      # Lưu màu người thắng ('white'/'black')
     self.result = None      # Lưu kết quả ('checkmate'/'stalemate')
 

@@ -101,7 +101,7 @@ class Board:
     self.last_move = move
 
 
-  """===============================================KIỂM TRA TRẠNG THÁI=============================================="""
+  """===============================================KIỂM TRA TRẠNG THÁI================================================"""
   def check_game_status(self, color):
     # Tìm Vua
     print(f"\n=== Kiểm tra trạng thái cho {color} ===")
