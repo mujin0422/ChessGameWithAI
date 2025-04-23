@@ -118,12 +118,7 @@ class AI:
                     for move in piece.moves:
                         moves.append((piece, move))
         return moves
-
-
-import time
-import copy
-import random
-from collections import defaultdict
+    
 
 class AI_Minimax(AI):
     def __init__(self, board):
