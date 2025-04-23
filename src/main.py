@@ -6,6 +6,8 @@ from game import Game
 from square import Square
 from move import Move
 from ai import AI_Minimax
+from menu import get_game_mode
+
 
 class Main:
     def __init__(self):
@@ -13,6 +15,7 @@ class Main:
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         pygame.display.set_caption('CHESS GAME')
         self.game = Game()
+        self.restart_to_menu = False
         self.ai_enabled = True
         self.ai_thinking = False
         self.ai_move = None
@@ -141,6 +144,8 @@ class Main:
             self.reset_game()
         elif event.key == pygame.K_a:
             self.ai_enabled = not self.ai_enabled  # Bật/tắt AI
+        elif event.key == pygame.K_ESCAPE:
+            self.restart_to_menu = True  # Đặt cờ để thoát về menu
 
     def reset_game(self):
         """Reset game về trạng thái ban đầu"""
@@ -196,6 +201,11 @@ class Main:
         while True:
             # Xử lý sự kiện
             self.handle_events()
+
+            # Nếu người dùng bấm ESC, thoát vòng lặp để quay lại menu
+            if self.restart_to_menu:
+                pygame.display.quit()  
+                break
             
             # Xử lý AI
             if not self.game.game_over and self.game.next_player == 'black' and self.ai_enabled:
@@ -212,5 +222,19 @@ class Main:
             clock.tick(60)
 
 if __name__ == "__main__":
-    main = Main()
-    main.mainLoop()
+    while True:
+        # Gọi giao diện chọn chế độ
+        mode = get_game_mode()
+
+        if mode is None:
+            sys.exit()  # Người dùng bấm "EXIT"
+
+        # Khởi chạy game
+        main = Main()
+        main.ai_enabled = mode
+        main.mainLoop()
+
+        # Nếu không nhấn ESC trong game, thoát
+        if not main.restart_to_menu:
+            break
+
