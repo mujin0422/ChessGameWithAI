@@ -1,174 +1,216 @@
-""" CHẠY GAME
-- Tạo cửa sổ game, vòng lặp game, xử lí các sự kiện
-- Gọi các hàm hiển thị bàn cờ và quân cờ
-"""
 import pygame
 import sys
-
+import copy
 from const import *
 from game import Game
 from square import Square
 from move import Move
-from ai import AI_Minimax, AI_Stupid
+from ai import AI_Minimax
 
 class Main:
-  def __init__(self):
-    pygame.init()
-    self.screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
-    pygame.display.set_caption('CHESS GAME')
-    self.game = Game()
-    self.ai_type = 'minimax'
-    self.ai_enabled = True
+    def __init__(self):
+        pygame.init()
+        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        pygame.display.set_caption('CHESS GAME')
+        self.game = Game()
+        self.ai_enabled = True
+        self.ai_thinking = False
+        self.ai_move = None
+        self.ai_delay = 400  # Thời gian delay để quan sát nước đi AI (ms)
 
-  
-  def mainLoop(self):
-    game = self.game
-    screen = self.screen
-    board = game.board
-    selector = game.selector
+    def handle_ai_turn(self):
+        """Xử lý lượt đi của AI cho quân đen"""
+        if (self.ai_enabled 
+            and not self.ai_thinking 
+            and self.game.next_player == 'black' 
+            and not self.game.game_over):
+            
+            self.ai_thinking = True
+            
+            # Tạo bản sao bàn cờ để AI tính toán
+            board_copy = copy.deepcopy(self.game.board)
+            ai = AI_Minimax(board_copy)
+            self.ai_move = ai.get_best_move('black')
+            
+            self.ai_thinking = False
 
-    while True:
-        screen.fill((0, 0, 0))
+    def execute_ai_move(self):
+        """Thực hiện nước đi của AI"""
+        if self.ai_move and not self.game.game_over:
+            piece, move = self.ai_move
+            final_square = self.game.board.squares[move.final.row][move.final.col]
+            captured = final_square.has_piece()
+            
+            # Thực hiện nước đi
+            self.game.board.move(piece, move)
+            self.game.board.set_true_en_passant(piece)
+            self.game.play_sound(captured)
+            self.game.next_turn()
+            
+            # Kiểm tra trạng thái game
+            self.check_game_status()
+            
+            self.ai_move = None
 
-        # Vẽ các thành phần
-        game.show_bg(screen)
-        game.show_last_move(screen)
-        game.show_moves(screen)
-        game.show_hover(screen)
-        game.show_pieces(screen)
-        
-        # AI tự đi nếu đến lượt đen
-        if self.ai_enabled and game.next_player == 'black' and not game.game_over:
-            pygame.time.delay(400)  # Cho dễ theo dõi
-            ai = AI_Minimax(board) if self.ai_type == 'minimax' else AI_Stupid(board)
-            result = ai.get_best_move('black') if self.ai_type == 'minimax' else ai.get_random_move('black')
+    def check_game_status(self):
+        """Kiểm tra trạng thái kết thúc game"""
+        for color in ['white', 'black']:
+            status = self.game.board.check_game_status(color)
+            if status == 'checkmate':
+                self.game.game_over = True
+                self.game.winner = 'black' if color == 'white' else 'white'
+                self.game.result = 'checkmate'
+                break
+            elif status == 'stalemate':
+                self.game.game_over = True
+                self.game.result = 'stalemate'
+                break
 
-            if result:
-                piece, move = result
-                captured = board.squares[move.final.row][move.final.col].has_piece()
-                board.move(piece, move)
-                board.set_true_en_passant(piece)
-                game.play_sound(captured)
-                game.next_turn()
-
-                for color in ['white', 'black']:
-                    status = board.check_game_status(color)
-                    if status == 'checkmate':
-                        game.game_over = True
-                        game.winner = 'black' if color == 'white' else 'white'
-                        game.result = 'checkmate'
-                        break
-                    elif status == 'stalemate':
-                        game.game_over = True
-                        game.result = 'stalemate'
-                        break
-
-        # Vòng xử lý sự kiện
+    def handle_events(self):
+        """Xử lý tất cả sự kiện đầu vào"""
         for event in pygame.event.get():
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                mouseX, mouseY = event.pos
-                clicked_col = (mouseX - BOARD_X) // SQSIZE
-                clicked_row = (mouseY - BOARD_Y) // SQSIZE
-
-                if 0 <= clicked_row < ROWS and 0 <= clicked_col < COLS:
-                    clicked_square = board.squares[clicked_row][clicked_col]
-
-                    # Đã chọn quân cờ từ trước
-                    if selector.selecting:
-                        selected_piece = selector.piece
-                        start_row, start_col = selector.rowcol
-                        move = Move(Square(start_row, start_col), Square(clicked_row, clicked_col))
-
-                        if board.valid_move(selected_piece, move):
-                            captured = clicked_square.has_piece()
-                            board.move(selected_piece, move)
-
-                            """=============KIỂM TRA THĂNG THUA============="""
-                            for color in ['white', 'black']:
-                                status = board.check_game_status(color)
-                                print(f"Trạng thái của {color}: {status}") 
-                                if status == 'checkmate':
-                                    game.game_over = True   
-                                    game.winner = 'black' if color == 'white' else 'white'
-                                    game.result = 'checkmate'
-                                    break
-                                elif status == 'stalemate':
-                                    game.game_over = True
-                                    game.result = 'stalemate'
-                                    break
-                            """==========end KIỂM TRA THĂNG THUA============"""
-
-                            board.set_true_en_passant(selected_piece)
-                            game.play_sound(captured)
-
-                            game.next_turn()
-                        # Hủy chọn dù có đi hay không
-                        selector.unselect_piece()
-                    else:
-                        # Nếu click vào quân cờ đúng lượt
-                        if clicked_square.has_piece():
-                            piece = clicked_square.piece
-                            if piece.color == game.next_player:
-                                board.calc_moves(piece, clicked_row, clicked_col, True)
-                                selector.select_piece(piece, (clicked_row, clicked_col))
-
-            elif event.type == pygame.MOUSEMOTION:
-                hover_row = (event.pos[1] - BOARD_Y) // SQSIZE
-                hover_col = (event.pos[0] - BOARD_X) // SQSIZE
-                game.set_hover(hover_row, hover_col)
-
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_t:
-                    game.change_theme()
-
-                elif event.key == pygame.K_r:
-                    game.reset()
-                    # Reset trạng thái kết thúc của lớp GAME
-                    game.game_over = False  
-                    game.winner = None
-                    game.result = None
-                    # Cập nhật lại các biến tham chiếu
-                    board = game.board
-                    selector = game.selector
-                elif event.key == pygame.K_a:
-                    self.ai_enabled = not self.ai_enabled  # Bật/Tắt AI
-                elif event.key == pygame.K_m:
-                    self.ai_type = 'minimax'  # Đổi sang Minimax AI
-                elif event.key == pygame.K_n:
-                    self.ai_type = 'random'   # Đổi sang AI Random
-            elif event.type == pygame.QUIT:
+            if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-
-        # =========== HIỂN THỊ THÔNG BÁO KHI GAME KẾT THÚC ==============
-        if game.game_over:
-            # Tạo overlay mờ
-            overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
-            overlay.fill((0, 0, 0, 180))  # Màu đen với độ trong suốt
-            screen.blit(overlay, (0, 0))
-            # Hiển thị thông báo
-            font = pygame.font.SysFont('Arial', 50, bold=True)
-            if game.result == 'checkmate':
-                winner = 'WHITE' if game.winner == 'white' else 'ĐEN'
-                text = f"{winner} WIN!"
-                color = (255, 215, 0)  
-            else:
-                text = "DRAW!"
-                color = (255, 255, 255) 
-            text_surface = font.render(text, True, color)
-            text_rect = text_surface.get_rect(center=(SCREEN_WIDTH//2, SCREEN_HEIGHT//2))
-            screen.blit(text_surface, text_rect)
+                
+            if not self.game.game_over:
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    self.handle_mouse_click(event)
+                elif event.type == pygame.MOUSEMOTION:
+                    self.handle_mouse_motion(event)
             
-            # Hướng dẫn chơi lại
-            font_small = pygame.font.SysFont('Arial', 30)
-            restart_text = font_small.render("Press R To Rematch", True, (200, 200, 200))
-            restart_rect = restart_text.get_rect(center=(SCREEN_WIDTH//2, SCREEN_HEIGHT//2 + 60))
-            screen.blit(restart_text, restart_rect)
-        # ========= END HIỂN THỊ THÔNG BÁO KHI GAME KẾT THÚC ==========
+            if event.type == pygame.KEYDOWN:
+                self.handle_key_press(event)
 
-        pygame.display.update()
+    def handle_mouse_click(self, event):
+        """Xử lý click chuột của người chơi"""
+        mouseX, mouseY = event.pos
+        clicked_col = (mouseX - BOARD_X) // SQSIZE
+        clicked_row = (mouseY - BOARD_Y) // SQSIZE
 
+        if 0 <= clicked_row < ROWS and 0 <= clicked_col < COLS:
+            clicked_square = self.game.board.squares[clicked_row][clicked_col]
+            selector = self.game.selector
 
+            # Đã chọn quân cờ trước đó
+            if selector.selecting:
+                self.handle_piece_move(clicked_row, clicked_col, clicked_square)
+            # Chọn quân cờ mới
+            elif clicked_square.has_piece() and clicked_square.piece.color == self.game.next_player:
+                self.select_piece(clicked_row, clicked_col, clicked_square)
 
-main = Main()
-main.mainLoop()
+    def handle_piece_move(self, row, col, square):
+        selector = self.game.selector
+        selected_piece = selector.piece
+        start_row, start_col = selector.rowcol
+        move = Move(Square(start_row, start_col), Square(row, col))
+
+        if self.game.board.valid_move(selected_piece, move):
+            captured = square.has_piece()
+            self.game.board.move(selected_piece, move)
+            self.game.board.set_true_en_passant(selected_piece)
+            self.game.play_sound(captured)
+            
+            # Vẽ lại ngay lập tức
+            self.draw_game()
+            pygame.display.update()
+            
+            self.game.next_turn()
+            self.check_game_status()
+        
+        selector.unselect_piece()
+
+    def select_piece(self, row, col, square):
+        """Chọn quân cờ để di chuyển"""
+        piece = square.piece
+        if piece.color == self.game.next_player:
+            self.game.board.calc_moves(piece, row, col, True)
+            self.game.selector.select_piece(piece, (row, col))
+
+    def handle_mouse_motion(self, event):
+        """Xử lý di chuyển chuột"""
+        hover_row = (event.pos[1] - BOARD_Y) // SQSIZE
+        hover_col = (event.pos[0] - BOARD_X) // SQSIZE
+        self.game.set_hover(hover_row, hover_col)
+
+    def handle_key_press(self, event):
+        """Xử lý phím bấm"""
+        if event.key == pygame.K_t:
+            self.game.change_theme()
+        elif event.key == pygame.K_r:
+            self.reset_game()
+        elif event.key == pygame.K_a:
+            self.ai_enabled = not self.ai_enabled  # Bật/tắt AI
+
+    def reset_game(self):
+        """Reset game về trạng thái ban đầu"""
+        self.game.reset()
+        self.game.game_over = False
+        self.game.winner = None
+        self.game.result = None
+        self.ai_thinking = False
+        self.ai_move = None
+
+    def draw_game(self):
+        """Vẽ tất cả thành phần game"""
+        self.screen.fill((0, 0, 0))
+        self.game.show_bg(self.screen)
+        self.game.show_last_move(self.screen)
+        self.game.show_moves(self.screen)
+        self.game.show_hover(self.screen)
+        self.game.show_pieces(self.screen)
+        
+        if self.game.game_over:
+            self.draw_game_over()
+
+    def draw_game_over(self):
+        """Hiển thị thông báo kết thúc game"""
+        # Overlay mờ
+        overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 180))
+        self.screen.blit(overlay, (0, 0))
+        
+        # Thông báo chính
+        font = pygame.font.SysFont('Arial', 50, bold=True)
+        if self.game.result == 'checkmate':
+            winner = 'WHITE' if self.game.winner == 'white' else 'BLACK'
+            text = f"{winner} WINS!"
+            color = (255, 215, 0)  # Gold color
+        else:
+            text = "DRAW!"
+            color = (255, 255, 255)  # White color
+        
+        text_surface = font.render(text, True, color)
+        text_rect = text_surface.get_rect(center=(SCREEN_WIDTH//2, SCREEN_HEIGHT//2))
+        self.screen.blit(text_surface, text_rect)
+        
+        # Hướng dẫn chơi lại
+        font_small = pygame.font.SysFont('Arial', 30)
+        restart_text = font_small.render("Press R to Rematch", True, (200, 200, 200))
+        restart_rect = restart_text.get_rect(center=(SCREEN_WIDTH//2, SCREEN_HEIGHT//2 + 60))
+        self.screen.blit(restart_text, restart_rect)
+
+    def mainLoop(self):
+        clock = pygame.time.Clock()
+        
+        while True:
+            # Xử lý sự kiện
+            self.handle_events()
+            
+            # Xử lý AI
+            if not self.game.game_over and self.game.next_player == 'black' and self.ai_enabled:
+                self.handle_ai_turn()
+                if self.ai_move:
+                    pygame.time.delay(self.ai_delay)  # Delay để quan sát
+                    self.execute_ai_move()
+                    self.draw_game()  # Vẽ lại sau khi AI đi
+                    pygame.display.update()
+            
+            # Vẽ game (bao gồm cả khi người chơi đi)
+            self.draw_game()
+            pygame.display.update()
+            clock.tick(60)
+
+if __name__ == "__main__":
+    main = Main()
+    main.mainLoop()
