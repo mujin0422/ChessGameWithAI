@@ -237,4 +237,3 @@ if __name__ == "__main__":
         # Nếu không nhấn ESC trong game, thoát
         if not main.restart_to_menu:
             break
-
