@@ -23,6 +23,16 @@ class Game:
   
   def show_bg(self, surface):
     theme = self.config.theme
+     # Vẽ viền nâu xung quanh bàn cờ (dày 20px)
+    border_color = (101, 67, 33)  # Màu nâu (Brown)
+    border_rect = pygame.Rect(
+        BOARD_X - 30,  #
+        BOARD_Y - 30,  
+        COLS * SQSIZE + 60,  
+        ROWS * SQSIZE + 60  
+    )
+    pygame.draw.rect(surface, border_color, border_rect)
+
     """ Hiển thị nền bàn cờ với hai màu ô xen kẽ."""
     for row in range(ROWS):
       for col in range(COLS):
@@ -36,7 +46,14 @@ class Game:
         if col == 0:
           color = theme.bg.dark if row % 2 == 0 else theme.bg.light
           lbl = self.config.font.render(str(ROWS - row), 1, color)
-          lbl_x = BOARD_X - 20  # Đẩy số ra ngoài bàn cờ
+          lbl_x = BOARD_X - 20  
+          lbl_y = BOARD_Y + row * SQSIZE + (SQSIZE - lbl.get_height()) // 2
+          surface.blit(lbl, (lbl_x, lbl_y))
+        # Hiển thị số hàng (1-8) bên phải bàn cờ
+        if col == 7:
+          color = theme.bg.dark if (row + col) % 2 == 0 else theme.bg.light
+          lbl = self.config.font.render(str(ROWS - row), 1, color)
+          lbl_x = BOARD_X + COLS * SQSIZE + 10  
           lbl_y = BOARD_Y + row * SQSIZE + (SQSIZE - lbl.get_height()) // 2
           surface.blit(lbl, (lbl_x, lbl_y))
         # Hiển thị chữ cái cột (A-H) ở hàng dưới cùng
@@ -44,8 +61,16 @@ class Game:
           color = theme.bg.dark if (row + col) % 2 == 0 else theme.bg.light
           lbl = self.config.font.render(Square.get_alphacol(col), 1, color)
           lbl_x = BOARD_X + col * SQSIZE + (SQSIZE - lbl.get_width()) // 2
-          lbl_y = BOARD_Y + ROWS * SQSIZE + 5  # Đẩy chữ xuống dưới bàn cờ
+          lbl_y = BOARD_Y + ROWS * SQSIZE + 5  
           surface.blit(lbl, (lbl_x, lbl_y))
+        # Hiển thị chữ cái cột (A-H) ở hàng trên cùng
+        if row == 0:
+          color = theme.bg.dark if (row + col) % 2 == 0 else theme.bg.light
+          lbl = self.config.font.render(Square.get_alphacol(col), 1, color)
+          lbl_x = BOARD_X + col * SQSIZE + (SQSIZE - lbl.get_width()) // 2
+          lbl_y = BOARD_Y - 25  
+          surface.blit(lbl, (lbl_x, lbl_y))
+
 
   
   """ Hiển thị tất cả quân cờ lên bàn cờ (trừ quân đang được chọn)."""
