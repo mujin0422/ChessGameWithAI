@@ -12,74 +12,74 @@ class AI:
         # Bảng giá trị vị trí cho từng loại quân
         piece_square_tables = {
             'Pawn': [
-                [0,  0,  0,  0,  0,  0,  0,  0],
-                [50, 50, 50, 50, 50, 50, 50, 50],
-                [10, 10, 20, 30, 30, 20, 10, 10],
-                [5,  5, 10, 25, 25, 10,  5,  5],
-                [0,  0,  0, 20, 20,  0,  0,  0],
-                [5, -5,-10,  0,  0,-10, -5,  5],
-                [5, 10, 10,-20,-20, 10, 10,  5],
-                [0,  0,  0,  0,  0,  0,  0,  0]
+                [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],   
+                [5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0],   
+                [1.0, 1.0, 2.0, 3.0, 3.0, 2.0, 1.0, 1.0],
+                [0.5, 0.5, 1.0, 2.5, 2.5, 1.0, 0.5, 0.5],
+                [0.0, 0.0, 0.0, 2.0, 2.0, 0.0, 0.0, 0.0],
+                [0.5, -0.5, -1.0, 0.0, 0.0, -1.0, -0.5, 0.5],
+                [0.5, 1.0, 1.0, -2.0, -2.0, 1.0, 1.0, 0.5],
+                [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
             ],
             'Knight': [
-                [-50,-40,-30,-30,-30,-30,-40,-50],
-                [-40,-20,  0,  0,  0,  0,-20,-40],
-                [-30,  0, 10, 15, 15, 10,  0,-30],
-                [-30,  5, 15, 20, 20, 15,  5,-30],
-                [-30,  0, 15, 20, 20, 15,  0,-30],
-                [-30,  5, 10, 15, 15, 10,  5,-30],
-                [-40,-20,  0,  5,  5,  0,-20,-40],
-                [-50,-40,-30,-30,-30,-30,-40,-50]
+                [-5.0, -4.0, -3.0, -3.0, -3.0, -3.0, -4.0, -5.0],
+                [-4.0, -2.0, 0.0, 0.0, 0.0, 0.0, -2.0, -4.0],
+                [-3.0, 0.0, 1.0, 1.5, 1.5, 1.0, 0.0, -3.0],
+                [-3.0, 0.5, 1.5, 2.0, 2.0, 1.5, 0.5, -3.0],
+                [-3.0, 0.0, 1.5, 2.0, 2.0, 1.5, 0.0, -3.0],
+                [-3.0, 0.5, 1.0, 1.5, 1.5, 1.0, 0.5, -3.0],
+                [-4.0, -2.0, 0.0, 0.5, 0.5, 0.0, -2.0, -4.0],
+                [-5.0, -4.0, -3.0, -3.0, -3.0, -3.0, -4.0, -5.0]
             ],
             'Bishop': [
-                [-20,-10,-10,-10,-10,-10,-10,-20],
-                [-10,  0,  0,  0,  0,  0,  0,-10],
-                [-10,  0,  5, 10, 10,  5,  0,-10],
-                [-10,  5,  5, 10, 10,  5,  5,-10],
-                [-10,  0, 10, 10, 10, 10,  0,-10],
-                [-10, 10, 10, 10, 10, 10, 10,-10],
-                [-10,  5,  0,  0,  0,  0,  5,-10],
-                [-20,-10,-10,-10,-10,-10,-10,-20]
+                [-2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0],
+                [-1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0],
+                [-1.0, 0.0, 0.5, 1.0, 1.0, 0.5, 0.0, -1.0],
+                [-1.0, 0.5, 0.5, 1.0, 1.0, 0.5, 0.5, -1.0],
+                [-1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, -1.0],
+                [-1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0],
+                [-1.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.5, -1.0],
+                [-2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0]
             ],
             'Rook': [
-                [0,  0,  0,  0,  0,  0,  0,  0],
-                [5, 10, 10, 10, 10, 10, 10,  5],
-                [-5,  0,  0,  0,  0,  0,  0, -5],
-                [-5,  0,  0,  0,  0,  0,  0, -5],
-                [-5,  0,  0,  0,  0,  0,  0, -5],
-                [-5,  0,  0,  0,  0,  0,  0, -5],
-                [-5,  0,  0,  0,  0,  0,  0, -5],
-                [0,  0,  0,  5,  5,  0,  0,  0]
+                [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                [0.5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.5],
+                [-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.5],
+                [-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.5],
+                [-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.5],
+                [-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.5],
+                [-0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.5],
+                [0.0, 0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 0.0]
             ],
             'Queen': [
-                [-20,-10,-10, -5, -5,-10,-10,-20],
-                [-10,  0,  0,  0,  0,  0,  0,-10],
-                [-10,  0,  5,  5,  5,  5,  0,-10],
-                [-5,  0,  5,  5,  5,  5,  0, -5],
-                [0,  0,  5,  5,  5,  5,  0, -5],
-                [-10,  5,  5,  5,  5,  5,  0,-10],
-                [-10,  0,  5,  0,  0,  0,  0,-10],
-                [-20,-10,-10, -5, -5,-10,-10,-20]
+                [-2.0, -1.0, -1.0, -0.5, -0.5, -1.0, -1.0, -2.0],
+                [-1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0],
+                [-1.0, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0, -1.0],
+                [-0.5, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0, -0.5],
+                [0.0, 0.0, 0.5, 0.5, 0.5, 0.5, 0.0, -0.5],
+                [-1.0, 0.5, 0.5, 0.5, 0.5, 0.5, 0.0, -1.0],
+                [-1.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, -1.0],
+                [-2.0, -1.0, -1.0, -0.5, -0.5, -1.0, -1.0, -2.0]
             ],
             'King': [
-                [-30,-40,-40,-50,-50,-40,-40,-30],
-                [-30,-40,-40,-50,-50,-40,-40,-30],
-                [-30,-40,-40,-50,-50,-40,-40,-30],
-                [-30,-40,-40,-50,-50,-40,-40,-30],
-                [-20,-30,-30,-40,-40,-30,-30,-20],
-                [-10,-20,-20,-20,-20,-20,-20,-10],
-                [20, 20,  0,  0,  0,  0, 20, 20],
-                [20, 30, 10,  0,  0, 10, 30, 20]
+                [-3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0],
+                [-3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0],
+                [-3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0],
+                [-3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0],
+                [-2.0, -3.0, -3.0, -4.0, -4.0, -3.0, -3.0, -2.0],
+                [-1.0, -2.0, -2.0, -2.0, -2.0, -2.0, -2.0, -1.0],
+                [2.0, 2.0, 0.0, 0.0, 0.0, 0.0, 2.0, 2.0],        
+                [2.0, 3.0, 1.0, 0.0, 0.0, 1.0, 3.0, 2.0]
             ]
         }
         
         value_map = {
-            'Pawn': 100,
-            'Knight': 320,
-            'Bishop': 330,
-            'Rook': 500,
-            'Queen': 900,
-            'King': 20000
+            'Pawn': 1.0,
+            'Knight': 3.2,
+            'Bishop': 3.3,
+            'Rook': 5.0,
+            'Queen': 9.0,
+            'King': 1000.0
         }
         
         score = 0
@@ -123,14 +123,9 @@ class AI:
 class AI_Minimax(AI):
     def __init__(self, board):
         super().__init__(board)
-        # Cấu hình thời gian
-        self.time_limit = 3  # Giới hạn 3 giây cho mỗi nước đi
+        self.depth = 3  # Độ sâu cố định
+        self.time_limit = 2  # Giới hạn 3 giây cho mỗi nước đi
         self.max_nodes = 50000  # Giới hạn số node tối đa
-        
-        # Cấu hình giai đoạn game
-        self.endgame_threshold = 6  # Số quân tối đa để xem là endgame
-        self.midgame_depth = 3  # Độ sâu midgame
-        self.endgame_depth = 5   # Độ sâu endgame
         
         # Hệ thống tối ưu
         self.transposition_table = {}
@@ -138,25 +133,12 @@ class AI_Minimax(AI):
         self.nodes_searched = 0
         self.start_time = 0
 
-    def is_endgame(self, board):
-        """Xác định có phải endgame dựa trên số quân còn lại (không tính vua)"""
-        piece_count = 0
-        for row in range(8):
-            for col in range(8):
-                if board.squares[row][col].has_piece():
-                    piece = board.squares[row][col].piece
-                    if piece.__class__.__name__ not in ['King']:
-                        piece_count += 1
-                        if piece_count > self.endgame_threshold:
-                            return False
-        return True
-
-    def get_search_depth(self, is_endgame):
-        """Điều chỉnh độ sâu theo giai đoạn game"""
-        return self.endgame_depth if is_endgame else self.midgame_depth
+    def evaluate_board(self):
+        """Đơn giản hóa đánh giá bàn cờ"""
+        return super().evaluate_board()  # Chỉ sử dụng đánh giá cơ bản
 
     def get_board_hash(self, board):
-        """Tạo hash cho bàn cờ bao gồm cả giai đoạn game"""
+        """Đơn giản hóa hash bàn cờ"""
         hash_str = []
         for row in board.squares:
             for square in row:
@@ -165,23 +147,40 @@ class AI_Minimax(AI):
                     hash_str.append(f"{piece.color[0]}{piece.__class__.__name__[0]}")
                 else:
                     hash_str.append("--")
-        return "|".join(hash_str) + f"|{'E' if self.is_endgame(board) else 'M'}"
+        return "|".join(hash_str)
 
-    def evaluate_board(self):
-        """Mở rộng phương thức evaluate_board của lớp cha"""
-        score = super().evaluate_board()  # Sử dụng đánh giá cơ bản từ lớp cha
+    def get_best_move(self, color):
+        """Đơn giản hóa tìm nước đi tốt nhất"""
+        self.start_time = time.time()
+        self.nodes_searched = 0
+        self.transposition_table.clear()
+        best_move = None
         
-        # Bổ sung đánh giá endgame
-        if self.is_endgame(self.board):
-            for row in range(8):
-                for col in range(8):
-                    piece = self.board.squares[row][col].piece
-                    if piece and piece.__class__.__name__ == 'King':
-                        # Ưu tiên đưa vua vào trung tâm trong endgame
-                        center_dist = max(abs(row-3.5), abs(col-3.5))
-                        score += (4 - center_dist) * (10 if piece.color == 'black' else -10)
+        try:
+            for current_depth in range(1, self.depth + 1):
+                _, pos, move = self.minimax(
+                    self.board, 
+                    color, 
+                    current_depth,
+                    -float('inf'),
+                    float('inf'),
+                    0
+                )
+                if pos and move:
+                    row, col = pos
+                    best_move = (self.board.squares[row][col].piece, move)
+                
+                if (time.time() - self.start_time > self.time_limit * 0.9 or
+                    (best_move and getattr(best_move[1], 'is_checkmate', False))):
+                    break
+                    
+        except TimeoutError:
+            pass
+            
+        print(f"Depth: {current_depth}, Nodes: {self.nodes_searched}, "
+              f"Time: {time.time()-self.start_time:.2f}s")
         
-        return score
+        return best_move or self.get_fallback_move(color)
 
     def get_all_moves(self, color, depth=0):
         """Mở rộng phương thức get_all_moves với move ordering"""
@@ -215,12 +214,12 @@ class AI_Minimax(AI):
     def get_piece_value(self, piece):
         """Lấy giá trị quân cờ từ value_map"""
         value_map = {
-            'Pawn': 100,
-            'Knight': 320,
-            'Bishop': 330,
-            'Rook': 500,
-            'Queen': 900,
-            'King': 20000
+            'Pawn': 1.0,
+            'Knight': 3.2,
+            'Bishop': 3.3,
+            'Rook': 5.0,
+            'Queen': 9.0,
+            'King': 1000.0
         }
         return value_map.get(piece.__class__.__name__, 0)
 
@@ -287,7 +286,7 @@ class AI_Minimax(AI):
     def minimax(self, board, color, depth, alpha, beta, current_depth=0):
         """Thuật toán minimax với alpha-beta pruning và transposition table"""
         self.nodes_searched += 1
-        
+
         # Kiểm tra giới hạn
         if (time.time() - self.start_time > self.time_limit or 
             self.nodes_searched > self.max_nodes):
@@ -298,8 +297,6 @@ class AI_Minimax(AI):
             entry = self.transposition_table[board_hash]
             if entry['depth'] >= depth:
                 return entry['value']
-        
-        is_endgame = self.is_endgame(board)
         
         # Đến độ sâu tối đa thì chuyển sang quiescence
         if depth == 0:
@@ -358,45 +355,6 @@ class AI_Minimax(AI):
         }
         
         return [best_value, best_move[0], best_move[1]]
-
-    def get_best_move(self, color):
-        """Tìm nước đi tốt nhất với iterative deepening"""
-        self.start_time = time.time()
-        self.nodes_searched = 0
-        self.transposition_table.clear()
-        best_move = None
-        
-        is_endgame = self.is_endgame(self.board)
-        max_depth = self.get_search_depth(is_endgame)
-        
-        try:
-            for depth in range(1, max_depth + 1):
-                _, pos, move = self.minimax(
-                    self.board, 
-                    color, 
-                    depth,
-                    -float('inf'),
-                    float('inf'),
-                    0
-                )
-                if pos and move:
-                    row, col = pos
-                    best_move = (self.board.squares[row][col].piece, move)
-                
-                # Thoát sớm nếu hết thời gian hoặc tìm thấy chiếu hết
-                if (time.time() - self.start_time > self.time_limit * 0.9 or
-                    (best_move and getattr(best_move[1], 'is_checkmate', False))):
-                    break
-                    
-        except TimeoutError:
-            pass
-            
-        # Log thông tin debug
-        print(f"Depth: {depth}, Nodes: {self.nodes_searched}, "
-              f"Time: {time.time()-self.start_time:.2f}s, "
-              f"Stage: {'Endgame' if is_endgame else 'Midgame'}")
-        
-        return best_move or self.get_fallback_move(color)
 
     def get_fallback_move(self, color):
         """Nước đi dự phòng nếu hết thời gian"""
