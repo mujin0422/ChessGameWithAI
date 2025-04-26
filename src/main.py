@@ -22,7 +22,7 @@ class Main:
         self.ai_delay = 400  # Thời gian delay để quan sát nước đi AI (ms)
 
     def handle_ai_turn(self):
-        """Xử lý lượt đi của AI cho quân đen"""
+        """Xử lý lượt đi của AI cho quân đen giống như Minimax folder"""
         if (self.ai_enabled 
             and not self.ai_thinking 
             and self.game.next_player == 'black' 
@@ -30,11 +30,33 @@ class Main:
             
             self.ai_thinking = True
             
-            # Tạo bản sao bàn cờ để AI tính toán
-            board_copy = copy.deepcopy(self.game.board)
-            ai = AI_Minimax(board_copy)
-            self.ai_move = ai.get_best_move('black')
-            
+            # Tạo AI với độ sâu 3, bật alpha-beta và bảng điểm vị trí
+            ai = AI_Minimax(self.game.board)
+            ai.depth = 3
+            ai.AlphaBetaPruning = True 
+            ai.UsePointMaps = True
+
+            # Tìm nước đi tốt nhất từ vị trí hiện tại
+            try:
+                depth = ai.get_search_depth(ai.is_endgame(self.game.board))
+                _, pos, move = ai.minimax(
+                    self.game.board,
+                    'black',
+                    depth,
+                    -float('inf'),
+                    float('inf'),
+                    0
+                )
+                if pos and move:
+                    row, col = pos
+                    self.ai_move = (self.game.board.squares[row][col].piece, move)
+                    # Lưu lịch sử để tránh lặp
+                    if self.ai_move:
+                        ai.update_move_history(self.ai_move[0], self.ai_move[1])
+            except:
+                # Nếu có lỗi, dùng fallback move
+                self.ai_move = ai.get_fallback_move('black')
+                
             self.ai_thinking = False
 
     def execute_ai_move(self):

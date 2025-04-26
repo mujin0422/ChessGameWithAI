@@ -24,7 +24,7 @@ class Game:
   def show_bg(self, surface):
     theme = self.config.theme
      # Vẽ viền nâu xung quanh bàn cờ (dày 20px)
-    border_color = (101, 67, 33)  # Màu nâu (Brown)
+    border_color = (101, 67, 33)  
     border_rect = pygame.Rect(
         BOARD_X - 30,  #
         BOARD_Y - 30,  
@@ -94,7 +94,7 @@ class Game:
                 piece.texture_rect = pygame.Rect(img_x, img_y, img_width, img_height)
 
                 surface.blit(img, piece.texture_rect)
-    # THÊM CÁI NÀY VÀO NÈ TIẾN ++++++++++++++++++++++++++++++++
+    
     if self.selector.selecting and self.selector.piece:
       piece = self.selector.piece
       

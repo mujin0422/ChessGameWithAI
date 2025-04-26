@@ -20,7 +20,6 @@ import copy
 import os
 
 class Board:
-  """Khởi tạo bàn cờ với 8x8 ô và thêm các quân cờ vào vị trí ban đầu."""
   def __init__(self):
     self.squares = [
         [0, 0, 0, 0, 0, 0, 0, 0],
@@ -119,7 +118,6 @@ class Board:
             break
     
     if not king_pos:
-        print("[DEBUG] Không tìm thấy Vua!")
         return None
 
     # Kiểm tra chiếu
@@ -147,7 +145,6 @@ class Board:
             if piece and piece.color == color:
                 self.calc_moves(piece, row, col, bool=True)
                 if piece.moves:
-                    print(f"[DEBUG] {piece.__class__.__name__} tai ({row}, {col}) co nuoc di hop le")
                     has_legal_move = True
                 piece.clear_move()
                 if has_legal_move:
@@ -155,7 +152,6 @@ class Board:
         if has_legal_move:
             break
 
-    # Xác định trạng thái
     if in_check:
         if not has_legal_move:
             print("[DEBUG] Kết quả: CHIẾU BÍ!")
@@ -266,17 +262,13 @@ class Board:
             initial = Square(row, col)
             final_piece = self.squares[possible_move_row][possible_move_col].piece
             final= Square(possible_move_row, possible_move_col, final_piece)
-            # create a new move
             move = Move(initial,final)
             # check potencial checks
             if bool:
               if not self.in_check(piece, move):
-                #append new move
                 piece.add_move(move)
             else:
-              #append new move
               piece.add_move(move)
-
 
       # en passant moves
       r = 3 if piece.color == "white" else 4
@@ -289,7 +281,6 @@ class Board:
               # create initial and final move squares
               initial = Square(row, col)
               final= Square(fr, col - 1, p)
-              # create a new move
               move = Move(initial,final)
               # check potencial checks
               if bool:
@@ -308,7 +299,6 @@ class Board:
               # create initial and final move squares
               initial = Square(row, col)
               final= Square(fr, col+1, p)
-              # create a new move
               move = Move(initial,final)
               # check potencial checks
               if bool:
@@ -340,17 +330,14 @@ class Board:
             initial = Square(row, col)
             final_piece = self.squares[possible_move_row][possible_move_col].piece
             final= Square(possible_move_row, possible_move_col, final_piece)
-            # create a new move
             move = Move(initial, final)
             # append new valid move
             if bool:
               if not self.in_check(piece, move):
-                #append new move
                 piece.add_move(move)
               else: 
                 break
             else:
-              #append new move
               piece.add_move(move)
       
     def straightlinr_moves(incrs):
@@ -365,30 +352,23 @@ class Board:
             initial = Square(row, col)
             final_piece = self.squares[possible_move_row][possible_move_col].piece
             final= Square(possible_move_row, possible_move_col, final_piece)
-            # create a new move
             move = Move(initial, final)
-
             # empty = countinue looping
             if self.squares[possible_move_row][possible_move_col].isempty():
               if bool:
                 if not self.in_check(piece, move):
-                  #append new move
                   piece.add_move(move)
               else:
-                #append new move
                 piece.add_move(move)
 
             # has enemy piece = add_move + break
             elif self.squares[possible_move_row][possible_move_col].has_enemy_piece(piece.color):
               if bool:
                 if not self.in_check(piece, move):
-                  #append new move
                   piece.add_move(move)
               else:
-                #append new move
                 piece.add_move(move)
               break
-
             # has team piece = break 
             elif self.squares[possible_move_row][possible_move_col].has_team_piece(piece.color):
               break
@@ -465,30 +445,22 @@ class Board:
 
     elif isinstance(piece, Bishop): 
       straightlinr_moves([
-        (-1, 1), # up-right
-        (-1, -1), # up-left
-        (1, 1), # down-right
-        (1, -1) # down-left
+        (-1, 1), (-1, -1),
+        (1, 1), (1, -1) 
       ])
 
     elif isinstance(piece,Rook): 
       straightlinr_moves([
-        (-1, 0), # up
-        (0 ,1), # right
-        (1, 0), # down
-        (0, -1) # left
+        (-1, 0), (0 ,1), 
+        (1, 0), (0, -1) 
       ])
 
     elif isinstance(piece, Queen): 
       straightlinr_moves([
-        (-1, 1),
-        (-1, -1),
-        (1, 1),
-        (1, -1),
-        (-1, 0),
-        (0 ,1),
-        (1, 0),
-        (0, -1)
+        (-1, 1), (-1, -1),
+        (1, 1), (1, -1),
+        (-1, 0), (0 ,1),
+        (1, 0), (0, -1)
       ])
 
     elif isinstance(piece,King): 
