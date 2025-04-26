@@ -174,3 +174,4 @@ class AI_Minimax(AI):
         if captures:
             return random.choice(captures)
         return random.choice(moves)
+    
