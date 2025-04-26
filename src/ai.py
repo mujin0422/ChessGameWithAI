@@ -68,19 +68,15 @@ class AI_Minimax(AI):
         
         for piece, move in moves:
             score = 0
-            target = self.board.squares[move.final.row][move.final.col].piece
-            
+            target = self.board.squares[move.final.row][move.final.col].piece       
             # Score captures
             if target:
                 score = 1000 + self.get_piece_value(target) - self.get_piece_value(piece)
                 if self.get_piece_value(target) > self.get_piece_value(piece):
                     score += 500
             
-            # Score checks
             if getattr(move, 'is_check', False):
                 score += 300
-            
-            # Score pawn promotions
             if piece.__class__.__name__ == 'Pawn' and move.final.row in [0, 7]:
                 score += 800
             
@@ -127,11 +123,9 @@ class AI_Minimax(AI):
         for piece, move in moves:
             copied_board = copy.deepcopy(self.board)
             copied_board.move(piece, move, testing=True)
-            
             score = -self.minimax(depth-1, -beta, -alpha, 'white' if color == 'black' else 'black')
             
             if score >= beta:
-                # Store killer move
                 if not self.board.squares[move.final.row][move.final.col].has_piece():
                     self.killer_moves[depth].append((piece.square.row, piece.square.col, move.final.row, move.final.col))
                     if len(self.killer_moves[depth]) > 2:
@@ -153,7 +147,6 @@ class AI_Minimax(AI):
             for depth in range(1, self.max_depth + 1):
                 alpha = float('-inf')
                 beta = float('inf')
-                
                 moves = self.get_sorted_moves(color)
                 for piece, move in moves:
                     copied_board = copy.deepcopy(self.board)
@@ -174,15 +167,10 @@ class AI_Minimax(AI):
         return best_move or self.get_fallback_move(color)
 
     def get_fallback_move(self, color):
-        """Return a random legal move when we can't find a good move"""
         moves = self.get_all_moves(color)
         if not moves:
             return None
-            
-        # Try to find captures first
         captures = [(p, m) for p, m in moves if self.board.squares[m.final.row][m.final.col].has_piece()]
         if captures:
             return random.choice(captures)
-            
-        # If no captures, return any legal move
         return random.choice(moves)
